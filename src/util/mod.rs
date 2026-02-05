@@ -1,3 +1,5 @@
+mod inverse;
+
 use terminal::Action;
 
 pub fn clear_line() {
