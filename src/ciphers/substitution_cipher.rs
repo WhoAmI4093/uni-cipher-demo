@@ -2,12 +2,12 @@ use log::{error, info, warn};
 use crate::ciphers::{get_chars, CharacterSet, CipherOperations};
 use std::collections::HashSet;
 use terminal::Action;
-use crate::{main_menu, unwrap_or_return};
+use crate::{main_menu};
 use crate::util::clear_line;
 
 pub fn demo() {
-    let character_set = unwrap_or_return!( CharacterSet::new("Enter an alphabet to use:", &main_menu) );
-    let key_character_set = unwrap_or_return!( CharacterSet::new("Enter the substitution to use:", &main_menu)); 
+    let character_set =  CharacterSet::new("Enter an alphabet to use:", &main_menu);
+    let key_character_set = CharacterSet::new("Enter the substitution to use:", &main_menu); 
 
     // if lengths dont math its bad :(
     if character_set.char_to_idx.len() != key_character_set.char_to_idx.len() {
@@ -30,7 +30,8 @@ fn demo_operation(character_set: &CharacterSet, key_character_set: &CharacterSet
 
     if desired_operation.is_err() {
         clear_line();
-        return demo()
+        demo();
+        std::process::exit(0);
     }
     let desired_operation = desired_operation.unwrap();
 

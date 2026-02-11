@@ -1,25 +1,29 @@
 use std::borrow::Cow;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter, Write};
 use inquire_derive::Selectable;
 use log::error;
+use crate::util::clear_line;
 
 pub mod substitution_cipher;
+pub mod affine_cipher;
 
 pub struct CharacterSet {
     pub alphabet: Vec<char>,
     pub char_to_idx: HashMap<char, usize>,
     pub idx_to_char: HashMap<usize, char>,
+    pub set_characters: HashSet<char>,
 }
 
 impl CharacterSet {
-    pub fn new(prompt: &str, previous_menu: &dyn Fn()) -> Option<CharacterSet> {
+    pub fn new(prompt: &str, previous_menu: &dyn Fn()) -> CharacterSet {
         let alph = get_chars(prompt);
 
         if alph.is_none() {
+            clear_line();
             previous_menu();
             // Todo! Use threads to not pollute the stack
-            return None;
+            std::process::exit(0);
         }
         let alph = alph.unwrap();
 
@@ -32,19 +36,15 @@ impl CharacterSet {
             error!("The string contains repeating characters, reinput it again");
             CharacterSet::new(prompt, previous_menu)
         } else {
-            Some(CharacterSet {
+            let set_characters = HashSet::from_iter(alph.iter().cloned()); 
+            CharacterSet {
                 alphabet: alph,
                 char_to_idx,
-                idx_to_char
-            })
+                idx_to_char,
+                set_characters
+            }
         }
     }
-}
-
-fn get_chars(prompt: &str) -> Option<Vec<char>> {
-    let alphabet: Result<Vec<char>, _> = inquire::Text::new(prompt).prompt().map(|ok| ok.chars().collect());
-
-    alphabet.ok()
 }
 
 #[derive(Debug, Clone, Copy, Selectable)]
@@ -82,3 +82,30 @@ impl Display for CipherOperations {
     }
 }
 
+fn get_chars(prompt: &str) -> Option<Vec<char>> {
+    let alphabet: Result<Vec<char>, _> = inquire::Text::new(prompt).prompt().map(|ok| ok.chars().collect());
+
+    alphabet.ok()
+}
+
+fn inquire_isize<T>(prompt: &str, back: &dyn Fn(T), args: T) -> isize {
+    let text = inquire::Text::new(prompt).prompt().ok();
+    let text = match text {
+        Some(text) => text,
+        None => {
+            clear_line();
+            back(args);
+            std::process::exit(0)
+        }
+    };
+
+    let number = text.parse::<isize>();
+
+    match number {
+        Ok(n) => n,
+        Err(_) => {
+            error!("Failed to parse number. Try again");
+            inquire_isize(prompt, back, args)
+        }
+    }
+}

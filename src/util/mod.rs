@@ -1,10 +1,10 @@
-mod inverse;
+pub mod inverse;
 
 use terminal::Action;
+use crate::TERMINAL;
 
 pub fn clear_line() {
-    let terminal = terminal::stdout();
-    let _ = terminal.act(Action::ClearTerminal(terminal::Clear::CurrentLine));
+    let _ = TERMINAL.act(Action::ClearTerminal(terminal::Clear::CurrentLine));
 }
 
 #[macro_export]

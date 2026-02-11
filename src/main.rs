@@ -3,10 +3,13 @@ mod ciphers;
 mod util;
 
 use std::fmt::{Display, Formatter, Write};
+use std::io::Stdout;
+use std::sync::LazyLock;
 use inquire;
 use inquire_derive::Selectable;
 use log::info;
-use crate::ciphers::substitution_cipher;
+use terminal::Terminal;
+use crate::ciphers::{affine_cipher, substitution_cipher};
 use crate::logging::setup_logger;
 
 #[derive(Debug, Clone, Copy, Selectable)]
@@ -32,6 +35,8 @@ impl Display for SupportedCiphers {
     }
 }
 
+static TERMINAL: LazyLock<Terminal<Stdout>> = LazyLock::new(|| terminal::stdout());
+
 fn main() {
     setup_logger().unwrap();
 
@@ -42,11 +47,15 @@ fn main() {
 fn main_menu() {
     let selected_cipher = unwrap_or_return!( SupportedCiphers::select("Select a cipher: ").prompt().ok() );
 
+    let _ = TERMINAL;
+
     match selected_cipher {
         SupportedCiphers::SubstitutionCipher => {
             substitution_cipher::demo();
         }
-        SupportedCiphers::AffineCipher => {}
+        SupportedCiphers::AffineCipher => {
+            affine_cipher::demo(());
+        }
         SupportedCiphers::AffineRecursiveCipher => {}
     }
 }
