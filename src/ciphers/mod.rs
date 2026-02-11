@@ -7,6 +7,7 @@ use crate::util::clear_line;
 
 pub mod substitution_cipher;
 pub mod affine_cipher;
+pub mod affine_recursive_cipher;
 
 pub struct CharacterSet {
     pub alphabet: Vec<char>,

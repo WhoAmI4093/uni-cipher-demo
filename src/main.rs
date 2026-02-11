@@ -9,7 +9,7 @@ use inquire;
 use inquire_derive::Selectable;
 use log::info;
 use terminal::Terminal;
-use crate::ciphers::{affine_cipher, substitution_cipher};
+use crate::ciphers::{affine_cipher, affine_recursive_cipher, substitution_cipher};
 use crate::logging::setup_logger;
 
 #[derive(Debug, Clone, Copy, Selectable)]
@@ -56,6 +56,8 @@ fn main_menu() {
         SupportedCiphers::AffineCipher => {
             affine_cipher::demo(());
         }
-        SupportedCiphers::AffineRecursiveCipher => {}
+        SupportedCiphers::AffineRecursiveCipher => {
+            affine_recursive_cipher::demo(());
+        }
     }
 }

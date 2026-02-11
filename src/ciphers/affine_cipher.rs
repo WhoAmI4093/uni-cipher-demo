@@ -35,7 +35,7 @@ fn demo_get_key_and_continue(DemoKeyAndContinueArgs{character_set, alphabet_leng
     let inverse_key_a = match mod_inverse(key_a, *alphabet_length) {
         Some(n) => n,
         None => {
-            error!("This value does not have an inverse mod {alphabet_length}. Try again");
+            error!("This value ({key_a}) does not have an inverse mod {alphabet_length}. Try again");
             return demo_get_key_and_continue(&DemoKeyAndContinueArgs {
                 character_set: &character_set,
                 alphabet_length: *alphabet_length

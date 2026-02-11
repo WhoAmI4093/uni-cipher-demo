@@ -1,3 +1,5 @@
+use crate::util::positive_mod;
+
 /// Returns `(gcd, coefficient_a, coefficient_b)` such that: `a * coefficient_a + b * coefficient_b = gcd`
 fn extended_gcd(a: isize, b: isize) -> (isize, isize, isize) {
     if b == 0 {
@@ -5,7 +7,7 @@ fn extended_gcd(a: isize, b: isize) -> (isize, isize, isize) {
         (a, 1, 0)
     } else {
         // Recursive step
-        let (gcd, prev_coefficient_a, prev_coefficient_b) = extended_gcd(b, a % b);
+        let (gcd, prev_coefficient_a, prev_coefficient_b) = extended_gcd(b, positive_mod(a, b));
         let current_coefficient_a = prev_coefficient_b;
         let current_coefficient_b = prev_coefficient_a - (a / b) * prev_coefficient_b;
 
@@ -29,14 +31,7 @@ pub fn mod_inverse(number: isize, modulus: isize) -> Option<isize> {
         return None;
     }
 
-    // Make it positive
-    let inverse = coefficient_number % modulus;
-
-    let inverse = if inverse < 0 {
-        modulus + inverse
-    } else {
-        inverse
-    };
+    let inverse = positive_mod(coefficient_number, modulus);
 
     Some(inverse)
 }
@@ -44,14 +39,32 @@ pub fn mod_inverse(number: isize, modulus: isize) -> Option<isize> {
 mod test {
     use super::*;
 
+    #[test]
+    fn extended_gcd_two() {
+        assert_eq!(extended_gcd(2, 5).0, 1);
+    }
+
+    #[test]
+    fn extended_gcd_minus_three() {
+        assert_eq!(extended_gcd(-3, 5).0, 1);
+    }
+
+    #[test]
+    fn extended_gcd_tests() {
+        assert_eq!(extended_gcd(-2, 5).0, 1);
+        assert_eq!(extended_gcd(-3, 5).0, 1);
+    }
+
     fn verify_inverse(initial: isize, inverse: Option<isize>, modulus: isize) -> bool {
         match inverse {
             Some(inverse) => {
+                println!("{initial}**-1 mod {modulus} eq {inverse}");
                 let v = (initial * inverse) % modulus;
                 v == 1 || v == -modulus + 1
             }
             None => {
-                extended_gcd(initial, modulus).0 != 1
+                println!("{initial} does not have an inverse mod {modulus}");
+                dbg!(extended_gcd(initial, modulus).0) != 1
             },
         }
 
@@ -73,6 +86,7 @@ mod test {
         test_one!(0, 5);
         test_one!(-5, 5);
         test_one!(-2, 5);
+        test_one!(-3, 5);
     }
 
     #[test]
