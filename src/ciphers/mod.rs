@@ -1,7 +1,9 @@
 use std::borrow::Cow;
 use std::collections::{HashMap, HashSet};
 use std::fmt::{Display, Formatter, Write};
+use std::fs;
 use std::io::Stdout;
+use std::path::PathBuf;
 use inquire_derive::Selectable;
 use log::{error, info};
 use crate::util::clear_line;
@@ -54,7 +56,10 @@ fn alphabet_select(prompt: &str, previous_menu: &dyn Fn(), shuffle: bool) -> Vec
     if let Some(selected_option) = selected_option {
         let mut chars = match selected_option {
             AlphabetSelect::Input => {
-                let alph = get_chars(prompt);
+                let alph = get_chars(prompt  /*, &|| {
+                    clear_line();
+                    alphabet_select(prompt, previous_menu, shuffle);
+                } */, None);
 
                 if alph.is_none() {
                     alphabet_select(prompt, previous_menu, shuffle)
@@ -141,10 +146,60 @@ impl Display for CipherOperations {
     }
 }
 
-fn get_chars(prompt: &str) -> Option<Vec<char>> {
-    let alphabet: Result<Vec<char>, _> = inquire::Text::new(prompt).prompt().map(|ok| ok.chars().collect());
+#[derive(Copy, Clone, Debug, Selectable)]
+enum CharsOptions {
+    Input,
+    File
+}
 
-    alphabet.ok()
+impl Display for CharsOptions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CharsOptions::Input => f.write_str("From input"),
+            CharsOptions::File => f.write_str("From file (will be lowercased and filtered)"),
+        }
+    }
+}
+
+fn get_chars(prompt: &str /*, previous_menu: &dyn Fn() */, allowed_characters: Option<&HashSet<char>>) -> Option<Vec<char>> {
+    info!("{prompt}");
+
+    let chosen_method = CharsOptions::select("Chose the way to get characters:").prompt().ok();
+
+    if let Some(method) = chosen_method {
+        match method {
+            CharsOptions::Input => {
+                let chars: Result<Vec<char>, _> = inquire::Text::new("Enter characters:").prompt().map(|ok| ok.chars().collect());
+
+                chars.ok()
+            }
+            CharsOptions::File => {
+                let chars: Option<Vec<char>> = inquire::Text::new("Enter file path: ").prompt().map(|ok| ok.chars().collect()).ok();
+
+                if chars.is_none() {
+                    return get_chars(prompt, allowed_characters)
+                }
+
+                let path = chars.unwrap().iter().collect::<String>();
+                let path_buf = PathBuf::from(path);
+                let file = fs::read(&path_buf).ok();
+                if file.is_none() {
+                    return get_chars(prompt, allowed_characters)
+                }
+
+                let file = file.unwrap();
+                let mut string = String::from_utf8_lossy(&file).to_ascii_lowercase();
+
+                if let Some(allowed_characters) = allowed_characters {
+                    string = string.chars().filter(|char| allowed_characters.contains(char)).collect();
+                }
+
+                Some(string.chars().collect())
+            }
+        }
+    } else {
+        return None
+    }
 }
 
 fn inquire_isize<T>(prompt: &str, back: &dyn Fn(T), args: T) -> isize {

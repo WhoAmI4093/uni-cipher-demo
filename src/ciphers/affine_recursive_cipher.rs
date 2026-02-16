@@ -171,7 +171,7 @@ fn demo_operation(character_set: &CharacterSet, alphabet_length: isize, key: &Ke
 
 //noinspection DuplicatedCode
 fn demo_encrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key) {
-    let text = match get_chars("Enter plaintext:") {
+    let text = match get_chars("Enter plaintext:", Some(&character_set.set_characters)) {
         Some(text) => text,
         None => {
             demo_operation(character_set, alphabet_length, key);
@@ -206,7 +206,7 @@ fn demo_encrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
 }
 
 fn demo_decrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key) {
-    let text = match get_chars("Enter ciphertext:") {
+    let text = match get_chars("Enter ciphertext:", Some(&character_set.set_characters)) {
         Some(text) => text,
         None => {
             demo_operation(character_set, alphabet_length, key);

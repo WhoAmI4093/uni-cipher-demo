@@ -42,7 +42,7 @@ fn demo_operation(character_set: &CharacterSet, key_character_set: &CharacterSet
 }
 
 fn demo_encrypt(character_set: &CharacterSet, key_character_set: &CharacterSet, desired_operation: &CipherOperations, set_initial: &HashSet<char>, set_substitution: &HashSet<char>) {
-    let text = get_chars(&*format!("Input {}:", desired_operation.text_type_name()));
+    let text = get_chars(&*format!("Input {}:", desired_operation.text_type_name()), Some(&character_set.set_characters));
 
     let text = match text { 
         Some(text) => text,
