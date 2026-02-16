@@ -35,7 +35,7 @@ impl Display for AlphabetSelect {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             AlphabetSelect::Input => f.write_str("From input"),
-            AlphabetSelect::CyrillicAndSpecial => f.write_str("Cyrillic and special characters"),
+            AlphabetSelect::CyrillicAndSpecial => f.write_str("Lowercase cyrillic and special characters"),
             AlphabetSelect::LatinLower => f.write_str("Lowercase latin"),
             AlphabetSelect::Numbers => f.write_str("Numbers"),
             AlphabetSelect::Combined => f.write_str("Combined (with newline & tab)"),
@@ -44,7 +44,7 @@ impl Display for AlphabetSelect {
 }
 
 const LATIN_ALPHABET: &str = include_str!(r"..\..\alphabets\latin.txt");
-const CYRILLIC_ALPHABET: &str = include_str!(r"..\..\alphabets\cyrillic_upper_lower_special.txt");
+const CYRILLIC_ALPHABET: &str = include_str!(r"..\..\alphabets\cyrillic_lower_special.txt");
 const NUMBERS_ALPHABET: &str = include_str!(r"..\..\alphabets\numbers.txt");
 const COMBINED_ALPHABET: &str = include_str!(r"..\..\alphabets\combined.txt");
 
