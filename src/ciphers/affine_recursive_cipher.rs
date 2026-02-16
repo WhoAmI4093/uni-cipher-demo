@@ -6,7 +6,7 @@ use crate::util::{clear_line, positive_mod};
 use crate::util::inverse::mod_inverse;
 
 pub fn demo(_: ()) {
-    let character_set = CharacterSet::new("Enter an alphabet to use:", &main_menu);
+    let character_set = CharacterSet::new("Enter an alphabet to use:", &main_menu, false);
 
     let alphabet_length: isize = match isize::try_from(character_set.alphabet.len()) {
         Ok(n) => n,

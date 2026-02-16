@@ -6,8 +6,8 @@ use crate::{main_menu};
 use crate::util::clear_line;
 
 pub fn demo() {
-    let character_set =  CharacterSet::new("Enter an alphabet to use:", &main_menu);
-    let key_character_set = CharacterSet::new("Enter the substitution to use:", &main_menu); 
+    let character_set =  CharacterSet::new("Enter an alphabet to use:", &main_menu, false);
+    let key_character_set = CharacterSet::new("Enter the substitution to use (will be shuffled if not input):", &main_menu, true);
 
     // if lengths dont math its bad :(
     if character_set.char_to_idx.len() != key_character_set.char_to_idx.len() {
