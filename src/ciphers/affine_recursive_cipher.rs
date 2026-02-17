@@ -189,21 +189,21 @@ fn demo_encrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
     }
 
     let mut ciphertext: Vec<char> = vec![];
-    let mut key = key.clone();
+    let mut key_clone = key.clone();
 
     for char in text {
-        let resulting_index = &isize::try_from(*character_set.char_to_idx.get(&char).unwrap()).unwrap() * key.multiplicative_first + key.additive_first;
+        let resulting_index = &isize::try_from(*character_set.char_to_idx.get(&char).unwrap()).unwrap() * key_clone.multiplicative_first + key_clone.additive_first;
         let resulting_index = positive_mod(resulting_index, alphabet_length);
 
         ciphertext.push(*character_set.idx_to_char.get(&usize::try_from(resulting_index).unwrap()).unwrap());
 
-        key.next(alphabet_length);
+        key_clone.next(alphabet_length);
     }
 
     OutputOptions::write(&ciphertext.iter().collect::<String>(),
                          &|| { demo_encrypt(character_set, alphabet_length, &key) });
 
-    demo_operation(character_set, alphabet_length, &key);
+    demo_operation(character_set, alphabet_length, key);
 }
 
 fn demo_decrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key) {
@@ -225,24 +225,24 @@ fn demo_decrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
     }
 
     let mut plaintext: Vec<char> = vec![];
-    let mut key = key.clone();
+    let mut key_clone = key.clone();
 
     for char in text {
-        let inverse_key = mod_inverse(key.multiplicative_first, alphabet_length).unwrap();
+        let inverse_key = mod_inverse(key_clone.multiplicative_first, alphabet_length).unwrap();
 
         let character_index = isize::try_from(*character_set.char_to_idx.get(&char).unwrap()).unwrap();
 
-        let resulting_index = (character_index - key.additive_first) * inverse_key;
+        let resulting_index = (character_index - key_clone.additive_first) * inverse_key;
         let resulting_index = positive_mod(resulting_index, alphabet_length);
 
         plaintext.push(*character_set.idx_to_char.get(&usize::try_from(resulting_index).unwrap()).unwrap());
 
-        key.next(alphabet_length);
+        key_clone.next(alphabet_length);
     }
 
     OutputOptions::write(&plaintext.iter().collect::<String>(),
-                         &|| { demo_decrypt(character_set, alphabet_length, &key) });
+                         &|| { demo_decrypt(character_set, alphabet_length, key) });
     //info!("Plaintext is: {}", plaintext.iter().collect::<String>());
 
-    demo_operation(character_set, alphabet_length, &key);
+    demo_operation(character_set, alphabet_length, key);
 }

@@ -3,7 +3,7 @@ use std::fmt::format;
 use log::{error, info, warn};
 use crate::ciphers::{get_chars, inquire_isize, CharacterSet, CipherOperations, OutputOptions};
 use crate::{main_menu, unwrap_or_return};
-use crate::util::clear_line;
+use crate::util::{clear_line, positive_mod};
 use crate::util::inverse::mod_inverse;
 
 pub fn demo(_: ()) {
@@ -126,7 +126,7 @@ fn demo_decrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
         demo_encrypt(character_set, alphabet_length, key);
     }
 
-    OutputOptions::write(&text.iter().map(|char| character_set.idx_to_char.get(&usize::try_from((key.inverse_multiplicative * isize::try_from(*character_set.char_to_idx.get(char).unwrap()).unwrap() + key.additive) % alphabet_length).unwrap()).unwrap() ).collect::<String>(),
+    OutputOptions::write(&text.iter().map(|char| character_set.idx_to_char.get(&usize::try_from(positive_mod(key.inverse_multiplicative * (isize::try_from(*character_set.char_to_idx.get(char).unwrap()).unwrap() - key.additive), alphabet_length)).unwrap()).unwrap() ).collect::<String>(),
                          &|| { demo_decrypt(character_set, alphabet_length, key) });
     //info!("Plaintext is: {}", );
     demo_operation(character_set, alphabet_length, key);

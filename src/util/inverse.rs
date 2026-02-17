@@ -6,7 +6,6 @@ fn extended_gcd(a: isize, b: isize) -> (isize, isize, isize) {
         // Base case: gcd(a, 0) = a = a*1 + 0*0
         (a, 1, 0)
     } else {
-        // Recursive step
         let (gcd, prev_coefficient_a, prev_coefficient_b) = extended_gcd(b, positive_mod(a, b));
         let current_coefficient_a = prev_coefficient_b;
         let current_coefficient_b = prev_coefficient_a - (a / b) * prev_coefficient_b;
@@ -16,14 +15,6 @@ fn extended_gcd(a: isize, b: isize) -> (isize, isize, isize) {
 }
 
 pub fn mod_inverse(number: isize, modulus: isize) -> Option<isize> {
-    /*
-    let number = if number < 0 {
-        modulus + (number % modulus)
-    } else {
-        number
-    };
-    */
-
     let (gcd, coefficient_number, _) = extended_gcd(number, modulus);
 
     // Existence check
@@ -37,11 +28,13 @@ pub fn mod_inverse(number: isize, modulus: isize) -> Option<isize> {
 }
 #[cfg(test)]
 mod test {
+    use log::info;
     use super::*;
 
     #[test]
     fn extended_gcd_two() {
         assert_eq!(extended_gcd(2, 5).0, 1);
+        dbg!( mod_inverse(7, 26).unwrap());
     }
 
     #[test]
