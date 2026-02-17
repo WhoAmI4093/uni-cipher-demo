@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 use log::{error, info};
-use crate::ciphers::{get_chars, inquire_isize, CharacterSet, CipherOperations};
+use crate::ciphers::{get_chars, inquire_isize, CharacterSet, CipherOperations, OutputOptions};
 use crate::main_menu;
 use crate::util::{clear_line, positive_mod};
 use crate::util::inverse::mod_inverse;
@@ -200,7 +200,8 @@ fn demo_encrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
         key.next(alphabet_length);
     }
 
-    info!("Ciphertext is: {}", ciphertext.iter().collect::<String>());
+    OutputOptions::write(&ciphertext.iter().collect::<String>(),
+                         &|| { demo_encrypt(character_set, alphabet_length, &key) });
 
     demo_operation(character_set, alphabet_length, &key);
 }
@@ -239,7 +240,9 @@ fn demo_decrypt(character_set: &CharacterSet, alphabet_length: isize, key: &Key)
         key.next(alphabet_length);
     }
 
-    info!("Plaintext is: {}", plaintext.iter().collect::<String>());
+    OutputOptions::write(&plaintext.iter().collect::<String>(),
+                         &|| { demo_decrypt(character_set, alphabet_length, &key) });
+    //info!("Plaintext is: {}", plaintext.iter().collect::<String>());
 
     demo_operation(character_set, alphabet_length, &key);
 }

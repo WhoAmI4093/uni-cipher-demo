@@ -1,5 +1,5 @@
 use log::{error, info, warn};
-use crate::ciphers::{get_chars, CharacterSet, CipherOperations};
+use crate::ciphers::{get_chars, CharacterSet, CipherOperations, OutputOptions};
 use std::collections::HashSet;
 use terminal::Action;
 use crate::{main_menu};
@@ -58,8 +58,8 @@ fn demo_encrypt(character_set: &CharacterSet, key_character_set: &CharacterSet, 
         demo_encrypt(character_set, key_character_set, desired_operation, set_initial, set_substitution);
     }
 
-    info!("Resulting {}: {}", desired_operation.other_type_name(), text.iter().map(|char| key_character_set.idx_to_char.get(character_set.char_to_idx.get(char).unwrap()).unwrap()).collect::<String>());
-
+    OutputOptions::write(&text.iter().map(|char| key_character_set.idx_to_char.get(character_set.char_to_idx.get(char).unwrap()).unwrap()).collect::<String>(),
+                         &|| { demo_operation(character_set, key_character_set, set_initial, set_substitution) });
     demo_operation(character_set, key_character_set, set_initial, set_substitution);
 }
 

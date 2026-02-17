@@ -184,6 +184,7 @@ fn get_chars(prompt: &str /*, previous_menu: &dyn Fn() */, allowed_characters: O
                 let path_buf = PathBuf::from(path);
                 let file = fs::read(&path_buf).ok();
                 if file.is_none() {
+                    error!("Invalid file path");
                     return get_chars(prompt, allowed_characters)
                 }
 
@@ -220,6 +221,54 @@ fn inquire_isize<T>(prompt: &str, back: &dyn Fn(T), args: T) -> isize {
         Err(_) => {
             error!("Failed to parse number. Try again");
             inquire_isize(prompt, back, args)
+        }
+    }
+}
+
+#[derive(Copy, Clone, Debug, Selectable)]
+pub enum OutputOptions {
+    Stdout,
+    File
+}
+
+impl Display for OutputOptions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OutputOptions::Stdout => f.write_str("Stdout"),
+            OutputOptions::File => f.write_str("File")
+        }
+    }
+}
+
+impl OutputOptions {
+    pub fn write(formatted_string: &String, previous_menu: &dyn Fn()) {
+        let selected_option = OutputOptions::select("Where to output results?").prompt().ok();
+
+        if selected_option.is_none() {
+            previous_menu();
+
+            std::process::exit(0);
+        }
+
+        let selected_option = selected_option.unwrap();
+
+        match selected_option {
+            OutputOptions::Stdout => info!("{formatted_string}"),
+            OutputOptions::File => {
+                let chars: Option<Vec<char>> = inquire::Text::new("Enter file path: ").prompt().map(|ok| ok.chars().collect()).ok();
+
+                if chars.is_none() {
+                    OutputOptions::write(formatted_string, previous_menu);
+                }
+
+                let path = chars.unwrap().iter().collect::<String>();
+                let path_buf = PathBuf::from(path);
+                let file = fs::write(&path_buf, formatted_string).ok();
+                if file.is_none() {
+                    error!("Invalid file path or cannot write to file");
+                    OutputOptions::write(formatted_string, previous_menu);
+                }
+            }
         }
     }
 }
