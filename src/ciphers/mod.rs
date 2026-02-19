@@ -189,7 +189,7 @@ fn get_chars(prompt: &str /*, previous_menu: &dyn Fn() */, allowed_characters: O
                 }
 
                 let file = file.unwrap();
-                let mut string = String::from_utf8_lossy(&file).to_ascii_lowercase();
+                let mut string = String::from_utf8_lossy(&file).to_lowercase();
 
                 if let Some(allowed_characters) = allowed_characters {
                     string = string.chars().filter(|char| allowed_characters.contains(char)).collect();
